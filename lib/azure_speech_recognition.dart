@@ -20,6 +20,7 @@ class AzureSpeechRecognition {
 
   static String _subKey;
   static String _region;
+  static String _baseUrl;
   static String _lang = "en-EN";
   static String _languageUnderstandingSubscriptionKey;
   static String _languageUnderstandingServiceRegion;
@@ -31,6 +32,16 @@ class AzureSpeechRecognition {
       {String lang}) {
     _subKey = subKey;
     _region = region;
+    if (lang != null) _lang = lang;
+  }
+
+  /// initializer using a custom speech service endpoint URL, useful when
+  /// working with the Speech container. The region parameter is ignored.
+  AzureSpeechRecognition.initializeWithEndpoint(
+      String subKey, String baseUrl,
+      {String lang}) {
+    _subKey = subKey;
+    _baseUrl = baseUrl;
     if (lang != null) _lang = lang;
   }
 
@@ -105,9 +116,13 @@ class AzureSpeechRecognition {
   /// Return the text obtained or the error catched
 
   static simpleVoiceRecognition() {
-    if ((_subKey != null && _region != null)) {
-      _channel.invokeMethod('simpleVoice',
-          {'language': _lang, 'subscriptionKey': _subKey, 'region': _region});
+    if ((_subKey != null && (_region != null || _baseUrl != null))) {
+      _channel.invokeMethod('simpleVoice', {
+        'language': _lang,
+        'subscriptionKey': _subKey,
+        'region': _region,
+        'endpoint': _baseUrl
+      });
     } else {
       throw "Error: SpeechRecognitionParameters not initialized correctly";
     }
@@ -117,9 +132,13 @@ class AzureSpeechRecognition {
   /// Return the text obtained or the error catched
 
   static micStream() {
-    if ((_subKey != null && _region != null)) {
-      _channel.invokeMethod('micStream',
-          {'language': _lang, 'subscriptionKey': _subKey, 'region': _region});
+    if ((_subKey != null && (_region != null || _baseUrl != null))) {
+      _channel.invokeMethod('micStream', {
+        'language': _lang,
+        'subscriptionKey': _subKey,
+        'region': _region,
+        'endpoint': _baseUrl
+      });
     } else {
       throw "Error: SpeechRecognitionParameters not initialized correctly";
     }
@@ -129,18 +148,26 @@ class AzureSpeechRecognition {
   /// Return the text obtained or the error catched
 
   static continuousRecording() {
-    if (_subKey != null && _region != null) {
-      _channel.invokeMethod('continuousStream',
-          {'language': _lang, 'subscriptionKey': _subKey, 'region': _region});
+    if (_subKey != null && (_region != null || _baseUrl != null)) {
+      _channel.invokeMethod('continuousStream', {
+        'language': _lang,
+        'subscriptionKey': _subKey,
+        'region': _region,
+        'endpoint': _baseUrl
+      });
     } else {
       throw "Error: SpeechRecognitionParameters not initialized correctly";
     }
   }
 
   static dictationMode() {
-    if (_subKey != null && _region != null) {
-      _channel.invokeMethod('dictationMode',
-          {'language': _lang, 'subscriptionKey': _subKey, 'region': _region});
+    if (_subKey != null && (_region != null || _baseUrl != null)) {
+      _channel.invokeMethod('dictationMode', {
+        'language': _lang,
+        'subscriptionKey': _subKey,
+        'region': _region,
+        'endpoint': _baseUrl
+      });
     } else {
       throw "Error: SpeechRecognitionParameters not initialized correctly";
     }
@@ -157,7 +184,8 @@ class AzureSpeechRecognition {
         'language': _lang,
         'subscriptionKey': _languageUnderstandingSubscriptionKey,
         'appId': _languageUnderstandingAppId,
-        'region': _languageUnderstandingServiceRegion
+        'region': _languageUnderstandingServiceRegion,
+        'endpoint': _baseUrl
       });
     } else {
       throw "Error: LanguageUnderstading not initialized correctly";
@@ -169,11 +197,12 @@ class AzureSpeechRecognition {
   /// Return the speech obtained or the error catched
 
   static speechRecognizerWithKeyword(String kwsModelName) {
-    if (_subKey != null && _region != null) {
+    if (_subKey != null && (_region != null || _baseUrl != null)) {
       _channel.invokeMethod('keywordRecognizer', {
         'language': _lang,
         'subscriptionKey': _subKey,
         'region': _region,
+        'endpoint': _baseUrl,
         'kwsModel': kwsModelName
       });
     } else {

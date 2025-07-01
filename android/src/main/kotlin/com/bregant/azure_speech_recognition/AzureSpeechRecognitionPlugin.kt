@@ -103,39 +103,42 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
       var permissionRequestId : Int = 5;
       var speechSubscriptionKey : String = ""+call.argument("subscriptionKey");
       var serviceRegion : String= ""+call.argument("region");
+      var endpoint : String? = call.argument("endpoint");
       var lang : String = ""+call.argument("language");
-
-      simpleSpeechRecognition(speechSubscriptionKey,serviceRegion,lang);
+      simpleSpeechRecognition(speechSubscriptionKey,serviceRegion,endpoint,lang);
       result.success(true);
 
     }else if(call.method == "micStream"){
       var permissionRequestId : Int = 5;
       var speechSubscriptionKey : String = ""+call.argument("subscriptionKey");
       var serviceRegion : String= ""+call.argument("region");
+      var endpoint : String? = call.argument("endpoint");
       var lang : String = ""+call.argument("language");
 
 
-      micStreamRecognition(speechSubscriptionKey,serviceRegion,lang);
+      micStreamRecognition(speechSubscriptionKey,serviceRegion,endpoint,lang);
       result.success(true);
 
     }else if(call.method == "continuousStream"){
       var permissionRequestId : Int = 5;
       var speechSubscriptionKey : String = ""+call.argument("subscriptionKey");
       var serviceRegion : String= ""+call.argument("region");
+      var endpoint : String? = call.argument("endpoint");
       var lang : String =  ""+call.argument("language");
 
 
-      micStreamContinuosly(speechSubscriptionKey,serviceRegion,lang);
+      micStreamContinuosly(speechSubscriptionKey,serviceRegion,endpoint,lang);
       result.success(true);
 
     }else if(call.method == "dictationMode"){
       var permissionRequestId : Int = 5;
       var speechSubscriptionKey : String = ""+call.argument("subscriptionKey");
       var serviceRegion : String= ""+call.argument("region");
+      var endpoint : String? = call.argument("endpoint");
       var lang : String =  ""+call.argument("language");
 
       enableDictation = true;
-      micStreamContinuosly(speechSubscriptionKey,serviceRegion,lang);
+      micStreamContinuosly(speechSubscriptionKey,serviceRegion,endpoint,lang);
       result.success(true);
 
     }
@@ -143,21 +146,23 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
       var permissionRequestId : Int = 5;
       var speechSubscriptionKey : String = ""+call.argument("subscriptionKey");
       var serviceRegion : String= ""+call.argument("region");
+      var endpoint : String? = call.argument("endpoint");
       var appId : String= ""+call.argument("appId");
       var lang : String =  ""+call.argument("language");
 
 
-      recognizeIntent(speechSubscriptionKey,serviceRegion,appId,lang);
+      recognizeIntent(speechSubscriptionKey,serviceRegion,endpoint,appId,lang);
       result.success(true);
 
     }else if(call.method == "keywordRecognizer"){
       var permissionRequestId : Int = 5;
       var speechSubscriptionKey : String = ""+call.argument("subscriptionKey");
       var serviceRegion : String= ""+call.argument("region");
+      var endpoint : String? = call.argument("endpoint");
       var lang : String =  ""+call.argument("language");
       var kwsModel : String = ""+call.argument("kwsModel");
 
-      keywordRecognizer(speechSubscriptionKey, serviceRegion, lang, kwsModel);
+      keywordRecognizer(speechSubscriptionKey, serviceRegion, endpoint, lang, kwsModel);
       result.success(true);
 
     }
@@ -170,7 +175,11 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
     azureChannel.setMethodCallHandler(null)
   }
 
-  fun simpleSpeechRecognition(speechSubscriptionKey:String,serviceRegion:String,lang:String) {
+  fun simpleSpeechRecognition(
+    speechSubscriptionKey:String,
+    serviceRegion:String,
+    endpoint:String?,
+    lang:String) {
     val logTag : String = "simpleVoice";
 
 
@@ -178,7 +187,11 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
       
       var audioInput : AudioConfig = AudioConfig.fromStreamInput(createMicrophoneStream());
 
-      var config : SpeechConfig = SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion); 
+      var config : SpeechConfig = if(endpoint != null && endpoint.isNotEmpty() && endpoint != "null"){
+        SpeechConfig.fromEndpoint(URI(endpoint), speechSubscriptionKey);
+      }else{
+        SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion);
+      }
       assert(config != null);
 
       config.speechRecognitionLanguage = lang;
@@ -216,7 +229,11 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
 
 
   // Mic Streaming, it need the additional method implementend to get the data from the async task
-  fun micStreamRecognition(speechSubscriptionKey:String,serviceRegion:String,lang:String){
+  fun micStreamRecognition(
+    speechSubscriptionKey:String,
+    serviceRegion:String,
+    endpoint:String?,
+    lang:String){
     val logTag : String = "micStream";
 
     try{
@@ -224,7 +241,11 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
       var audioInput : AudioConfig = AudioConfig.fromStreamInput(createMicrophoneStream());
 
 
-      var config : SpeechConfig = SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion); 
+      var config : SpeechConfig = if(endpoint != null && endpoint.isNotEmpty() && endpoint != "null"){
+        SpeechConfig.fromEndpoint(URI(endpoint), speechSubscriptionKey);
+      }else{
+        SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion);
+      }
       assert(config != null);
 
       config.speechRecognitionLanguage = lang;
@@ -262,7 +283,11 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
 
   // stream continuosly until you press the button to stop ! STILL NOT WORKING COMPLETELY
 
-  fun micStreamContinuosly(speechSubscriptionKey:String,serviceRegion:String,lang:String){
+  fun micStreamContinuosly(
+    speechSubscriptionKey:String,
+    serviceRegion:String,
+    endpoint:String?,
+    lang:String){
     val logTag : String = "micStreamContinuos";
     
     
@@ -298,7 +323,11 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
       //audioInput = AudioConfig.fromStreamInput(createMicrophoneStream());
 
 
-      var config : SpeechConfig = SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion); 
+      var config : SpeechConfig = if(endpoint != null && endpoint.isNotEmpty() && endpoint != "null"){
+        SpeechConfig.fromEndpoint(URI(endpoint), speechSubscriptionKey);
+      }else{
+        SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion);
+      }
       assert(config != null);
 
       config.speechRecognitionLanguage = lang;
@@ -356,7 +385,12 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
 
   /// Recognize Intent method from microsoft sdk
 
-  fun recognizeIntent(speechSubscriptionKey:String,serviceRegion:String,appId:String,lang:String){
+  fun recognizeIntent(
+    speechSubscriptionKey:String,
+    serviceRegion:String,
+    endpoint:String?,
+    appId:String,
+    lang:String){
     val logTag : String = "intent";
 
     var content :  ArrayList<String> = ArrayList<String>();
@@ -369,7 +403,11 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
       val audioInput = AudioConfig.fromStreamInput(createMicrophoneStream());
 
 
-      var config : SpeechConfig = SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion); 
+      var config : SpeechConfig = if(endpoint != null && endpoint.isNotEmpty() && endpoint != "null"){
+        SpeechConfig.fromEndpoint(URI(endpoint), speechSubscriptionKey);
+      }else{
+        SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion);
+      }
 
       assert(config != null);
 
@@ -419,7 +457,12 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
     }
   }
 
-  fun keywordRecognizer(speechSubscriptionKey:String,serviceRegion:String,lang:String,kwsModelFile:String) {
+  fun keywordRecognizer(
+    speechSubscriptionKey:String,
+    serviceRegion:String,
+    endpoint:String?,
+    lang:String,
+    kwsModelFile:String) {
     val logTag : String = "keyword";
     var continuousListeningStarted : Boolean = false;
     lateinit var reco : SpeechRecognizer;
@@ -451,7 +494,11 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
 
       audioInput = AudioConfig.fromStreamInput(createMicrophoneStream());
 
-      var config : SpeechConfig = SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion); 
+      var config : SpeechConfig = if(endpoint != null && endpoint.isNotEmpty() && endpoint != "null"){
+        SpeechConfig.fromEndpoint(URI(endpoint), speechSubscriptionKey);
+      }else{
+        SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion);
+      }
 
       assert(config != null);
 

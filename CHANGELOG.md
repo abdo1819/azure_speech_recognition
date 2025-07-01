@@ -3,6 +3,10 @@
 - BugFix
 - Support continuous recognition
 
+## 0.9.0
+
+- Added support for using a Speech service endpoint URL via `initializeWithEndpoint`.
+
 ## 0.8.0
 
 # Breaking changes:
