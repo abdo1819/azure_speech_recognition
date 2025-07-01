@@ -16,12 +16,14 @@ class _MyAppState extends State<MyApp> {
   AzureSpeechRecognition _speechAzure;
   String subKey = "your_key";
   String region = "your_server_region";
+  String baseUrl = "https://mycontainer:5000"; // optional when using container
   String lang = "it-IT";
   bool isRecording = false;
 
 void activateSpeechRecognizer(){
     // MANDATORY INITIALIZATION
-  AzureSpeechRecognition.initialize(subKey, region,lang: lang);
+  // Use region for the cloud API or baseUrl for the Speech container
+  AzureSpeechRecognition.initializeWithEndpoint(subKey, baseUrl, lang: lang);
   
   _speechAzure.setFinalTranscription((text) {
     // do what you want with your final transcription

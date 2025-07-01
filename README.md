@@ -26,9 +26,15 @@ import 'package:azure_speech_recognition/azure_speech_recognition.dart';
 There are 2 type of initializer:
 ### Simple initializer
 It should be used in any case other than the IntentRecognition.
-The language default setting is "en-EN" but you could use what you want (if it is supported). 
+The language default setting is "en-EN" but you could use what you want (if it is supported).
 ```dart
 AzureSpeechRecognition.initialize("your_subscription_key", "your_server_region",lang: "it-IT");
+```
+
+If you are using the Speech SDK container, you can specify the service endpoint instead of the region:
+
+```dart
+AzureSpeechRecognition.initializeWithEndpoint("your_subscription_key", "https://mycontainer:5000", lang: "it-IT");
 ```
 
 ### Intent initializer
