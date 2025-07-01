@@ -209,4 +209,19 @@ class AzureSpeechRecognition {
       throw "Error: SpeechRecognitionParameters not initialized correctly";
     }
   }
+
+  /// Real time transcription with speaker diarization support.
+  /// Returns partial results while identifying speakers.
+  static transcribeWithDiarization() {
+    if (_subKey != null && (_region != null || _baseUrl != null)) {
+      _channel.invokeMethod('transcribeWithDiarization', {
+        'language': _lang,
+        'subscriptionKey': _subKey,
+        'region': _region,
+        'endpoint': _baseUrl
+      });
+    } else {
+      throw "Error: SpeechRecognitionParameters not initialized correctly";
+    }
+  }
 }

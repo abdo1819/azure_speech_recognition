@@ -94,6 +94,14 @@ Future recognizeVoice() async {
 ### Voice recognition with microphone streaming
 It returns in the recognitionResultHandler the temporary phrases that it understand and at the end the final response is returned by the setFinalTranscription method.
 
+### Real time transcription with speaker diarization
+Returns partial transcription results while also providing a `speakerId` for each segment.
+
+```dart
+AzureSpeechRecognition.transcribeWithDiarization();
+```
+
+
 ```dart
 
 void activateSpeechRecognizer(){

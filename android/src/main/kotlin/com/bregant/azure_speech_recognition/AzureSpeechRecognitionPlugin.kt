@@ -17,6 +17,10 @@ import com.microsoft.cognitiveservices.speech.SpeechRecognitionResult;
 import com.microsoft.cognitiveservices.speech.SpeechRecognizer;
 import com.microsoft.cognitiveservices.speech.CancellationDetails;
 import com.microsoft.cognitiveservices.speech.KeywordRecognitionModel;
+import com.microsoft.cognitiveservices.speech.PropertyId;
+import com.microsoft.cognitiveservices.speech.transcription.ConversationTranscriber;
+import com.microsoft.cognitiveservices.speech.transcription.ConversationTranscriptionEventArgs;
+import com.microsoft.cognitiveservices.speech.transcription.ConversationTranscriptionResult;
 import com.bregant.azure_speech_recognition.MicrophoneStream;
 import android.app.Activity;
 
@@ -141,8 +145,17 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
       micStreamContinuosly(speechSubscriptionKey,serviceRegion,endpoint,lang);
       result.success(true);
 
-    }
-    else if(call.method == "intentRecognizer"){
+    }else if(call.method == "transcribeWithDiarization"){
+      var permissionRequestId : Int = 5;
+      var speechSubscriptionKey : String = ""+call.argument("subscriptionKey");
+      var serviceRegion : String= ""+call.argument("region");
+      var endpoint : String? = call.argument("endpoint");
+      var lang : String =  ""+call.argument("language");
+
+      transcribeWithDiarization(speechSubscriptionKey, serviceRegion, endpoint, lang);
+      result.success(true);
+
+    } else if(call.method == "intentRecognizer"){
       var permissionRequestId : Int = 5;
       var speechSubscriptionKey : String = ""+call.argument("subscriptionKey");
       var serviceRegion : String= ""+call.argument("region");
@@ -576,6 +589,45 @@ public class AzureSpeechRecognitionPlugin(): FlutterPlugin,Activity(),MethodCall
 
     handler.post{
         azureChannel.invokeMethod(method,arguments); 
+    }
+  }
+
+  fun transcribeWithDiarization(
+    speechSubscriptionKey:String,
+    serviceRegion:String,
+    endpoint:String?,
+    lang:String) {
+
+    val logTag : String = "transcriber"
+    try{
+      val audioInput = AudioConfig.fromStreamInput(createMicrophoneStream());
+      val config : SpeechConfig = if(endpoint != null && endpoint.isNotEmpty() && endpoint != "null"){
+        SpeechConfig.fromEndpoint(URI(endpoint), speechSubscriptionKey);
+      }else{
+        SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion);
+      }
+
+      config.speechRecognitionLanguage = lang;
+      config.setProperty(PropertyId.SpeechServiceResponse_DiarizeIntermediateResults, "true");
+
+      val transcriber = ConversationTranscriber(config, audioInput);
+
+      invokeMethod("speech.onRecognitionStarted",null);
+
+      transcriber.transcribing.addEventListener({ o, args ->
+        val txt = args.getResult().getText();
+        val speaker = args.getResult().getSpeakerId();
+        invokeMethod("speech.onSpeech","$speaker:$txt");
+      });
+
+      val task : Future<Void> = transcriber.startTranscribingAsync();
+
+      setOnTaskCompletedListener(task, { result ->
+        // started
+      })
+
+    }catch(exec:Exception){
+      invokeMethod("speech.onException", "Exception: "+exec.message);
     }
   }
 
