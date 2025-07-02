@@ -8,12 +8,14 @@ This project is a starting point for using the Azure Speech Recognition Services
 
 To use this plugin you must have already create an account on the cognitive service page.
 
+This version of the plugin uses Dart null safety and therefore requires Flutter 2.10 or later.
+
 ## Installation
 
 To install the package use the latest:
 
 ```dart
-azure_speech_recognition: ^0.8.2
+azure_speech_recognition: ^0.10.0
 ```
 
 ## Usage

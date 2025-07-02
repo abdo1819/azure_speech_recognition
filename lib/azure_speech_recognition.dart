@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 
-typedef void StringResultHandler(String text);
+typedef StringResultHandler = void Function(String text);
 
 class AzureSpeechRecognition {
   static const MethodChannel _channel =
@@ -18,18 +18,18 @@ class AzureSpeechRecognition {
     _channel.setMethodCallHandler(_platformCallHandler);
   }
 
-  static String _subKey;
-  static String _region;
-  static String _baseUrl;
+  static String? _subKey;
+  static String? _region;
+  static String? _baseUrl;
   static String _lang = "en-EN";
-  static String _languageUnderstandingSubscriptionKey;
-  static String _languageUnderstandingServiceRegion;
-  static String _languageUnderstandingAppId;
+  static String? _languageUnderstandingSubscriptionKey;
+  static String? _languageUnderstandingServiceRegion;
+  static String? _languageUnderstandingAppId;
 
   /// default intitializer for almost every type except for the intent recognizer.
   /// Default language -> English
   AzureSpeechRecognition.initialize(String subKey, String region,
-      {String lang}) {
+      {String? lang}) {
     _subKey = subKey;
     _region = region;
     if (lang != null) _lang = lang;
@@ -39,7 +39,7 @@ class AzureSpeechRecognition {
   /// working with the Speech container. The region parameter is ignored.
   AzureSpeechRecognition.initializeWithEndpoint(
       String subKey, String baseUrl,
-      {String lang}) {
+      {String? lang}) {
     _subKey = subKey;
     _baseUrl = baseUrl;
     if (lang != null) _lang = lang;
@@ -49,39 +49,39 @@ class AzureSpeechRecognition {
   /// Default language -> English
   AzureSpeechRecognition.initializeLanguageUnderstading(
       String subKey, String region, String appId,
-      {lang}) {
+      {String? lang}) {
     _languageUnderstandingSubscriptionKey = subKey;
     _languageUnderstandingServiceRegion = region;
     _languageUnderstandingAppId = appId;
     if (lang != null) _lang = lang;
   }
 
-  StringResultHandler exceptionHandler;
-  StringResultHandler recognitionResultHandler;
-  StringResultHandler finalTranscriptionHandler;
-  VoidCallback recognitionStartedHandler;
-  VoidCallback startRecognitionHandler;
-  VoidCallback recognitionStoppedHandler;
+  StringResultHandler? exceptionHandler;
+  StringResultHandler? recognitionResultHandler;
+  StringResultHandler? finalTranscriptionHandler;
+  VoidCallback? recognitionStartedHandler;
+  VoidCallback? startRecognitionHandler;
+  VoidCallback? recognitionStoppedHandler;
 
-  Future _platformCallHandler(MethodCall call) async {
+  Future<void> _platformCallHandler(MethodCall call) async {
     switch (call.method) {
       case "speech.onRecognitionStarted":
-        recognitionStartedHandler();
+        recognitionStartedHandler?.call();
         break;
       case "speech.onSpeech":
-        recognitionResultHandler(call.arguments);
+        recognitionResultHandler?.call(call.arguments);
         break;
       case "speech.onFinalResponse":
-        finalTranscriptionHandler(call.arguments);
+        finalTranscriptionHandler?.call(call.arguments);
         break;
       case "speech.onStartAvailable":
-        startRecognitionHandler();
+        startRecognitionHandler?.call();
         break;
       case "speech.onRecognitionStopped":
-        recognitionStoppedHandler();
+        recognitionStoppedHandler?.call();
         break;
       case "speech.onException":
-        exceptionHandler(call.arguments);
+        exceptionHandler?.call(call.arguments);
         break;
       default:
         print("Error: method called not found");
@@ -115,11 +115,11 @@ class AzureSpeechRecognition {
   /// Simple voice Recognition, the result will be sent only at the end.
   /// Return the text obtained or the error catched
 
-  static simpleVoiceRecognition() {
+  static void simpleVoiceRecognition() {
     if ((_subKey != null && (_region != null || _baseUrl != null))) {
       _channel.invokeMethod('simpleVoice', {
         'language': _lang,
-        'subscriptionKey': _subKey,
+        'subscriptionKey': _subKey!,
         'region': _region,
         'endpoint': _baseUrl
       });
@@ -131,11 +131,11 @@ class AzureSpeechRecognition {
   /// Speech recognition that return text while still recognizing
   /// Return the text obtained or the error catched
 
-  static micStream() {
+  static void micStream() {
     if ((_subKey != null && (_region != null || _baseUrl != null))) {
       _channel.invokeMethod('micStream', {
         'language': _lang,
-        'subscriptionKey': _subKey,
+        'subscriptionKey': _subKey!,
         'region': _region,
         'endpoint': _baseUrl
       });
@@ -147,11 +147,11 @@ class AzureSpeechRecognition {
   /// Speech recognition that doesnt stop recording text until you stopped it by calling again this function
   /// Return the text obtained or the error catched
 
-  static continuousRecording() {
+  static void continuousRecording() {
     if (_subKey != null && (_region != null || _baseUrl != null)) {
       _channel.invokeMethod('continuousStream', {
         'language': _lang,
-        'subscriptionKey': _subKey,
+        'subscriptionKey': _subKey!,
         'region': _region,
         'endpoint': _baseUrl
       });
@@ -160,11 +160,11 @@ class AzureSpeechRecognition {
     }
   }
 
-  static dictationMode() {
+  static void dictationMode() {
     if (_subKey != null && (_region != null || _baseUrl != null)) {
       _channel.invokeMethod('dictationMode', {
         'language': _lang,
-        'subscriptionKey': _subKey,
+        'subscriptionKey': _subKey!,
         'region': _region,
         'endpoint': _baseUrl
       });
@@ -176,15 +176,15 @@ class AzureSpeechRecognition {
   /// Intent recognition
   /// Return the intent obtained or the error catched
 
-  static intentRecognizer() {
+  static void intentRecognizer() {
     if (_languageUnderstandingSubscriptionKey != null &&
         _languageUnderstandingServiceRegion != null &&
         _languageUnderstandingAppId != null) {
       _channel.invokeMethod('intentRecognizer', {
         'language': _lang,
-        'subscriptionKey': _languageUnderstandingSubscriptionKey,
-        'appId': _languageUnderstandingAppId,
-        'region': _languageUnderstandingServiceRegion,
+        'subscriptionKey': _languageUnderstandingSubscriptionKey!,
+        'appId': _languageUnderstandingAppId!,
+        'region': _languageUnderstandingServiceRegion!,
         'endpoint': _baseUrl
       });
     } else {
@@ -196,11 +196,11 @@ class AzureSpeechRecognition {
   /// [kwsModelName] name of the file in the asset folder that contains the keywords
   /// Return the speech obtained or the error catched
 
-  static speechRecognizerWithKeyword(String kwsModelName) {
+  static void speechRecognizerWithKeyword(String kwsModelName) {
     if (_subKey != null && (_region != null || _baseUrl != null)) {
       _channel.invokeMethod('keywordRecognizer', {
         'language': _lang,
-        'subscriptionKey': _subKey,
+        'subscriptionKey': _subKey!,
         'region': _region,
         'endpoint': _baseUrl,
         'kwsModel': kwsModelName
@@ -212,11 +212,11 @@ class AzureSpeechRecognition {
 
   /// Real time transcription with speaker diarization support.
   /// Returns partial results while identifying speakers.
-  static transcribeWithDiarization() {
+  static void transcribeWithDiarization() {
     if (_subKey != null && (_region != null || _baseUrl != null)) {
       _channel.invokeMethod('transcribeWithDiarization', {
         'language': _lang,
-        'subscriptionKey': _subKey,
+        'subscriptionKey': _subKey!,
         'region': _region,
         'endpoint': _baseUrl
       });

@@ -7,6 +7,11 @@
 
 - Added support for using a Speech service endpoint URL via `initializeWithEndpoint`.
 
+## 0.10.0
+
+- Migrated plugin to null safety (requires Flutter 2.10+)
+- Added `transcribeWithDiarization` for real-time transcription with speaker identification.
+
 ## 0.8.0
 
 # Breaking changes:

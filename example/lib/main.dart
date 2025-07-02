@@ -4,16 +4,18 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:azure_speech_recognition/azure_speech_recognition.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   String _centerText = 'Unknown';
-  AzureSpeechRecognition _speechAzure;
+  late AzureSpeechRecognition _speechAzure;
   String subKey = "your_key";
   String region = "your_server_region";
   String baseUrl = "https://mycontainer:5000"; // optional when using container
@@ -43,14 +45,14 @@ void activateSpeechRecognizer(){
   @override
   void initState() {
     
-    _speechAzure = new AzureSpeechRecognition();
+    _speechAzure = AzureSpeechRecognition();
 
     activateSpeechRecognizer();
 
     super.initState();
   }
 
-Future _recognizeVoice() async {
+Future<void> _recognizeVoice() async {
     try {
       AzureSpeechRecognition.simpleVoiceRecognition();//await platform.invokeMethod('azureVoice');
      
@@ -71,12 +73,13 @@ Future _recognizeVoice() async {
         body: Center(
           child: Column(
             children: <Widget>[
-              Text('TEXT RECOGNIZED : $_centerText\n'),
+              Text("TEXT RECOGNIZED : $_centerText\n"),
               FloatingActionButton(
-                onPressed: (){
-                  if(!isRecording)_recognizeVoice();
+                onPressed: () {
+                  if (!isRecording) _recognizeVoice();
                 },
-                child: Icon(Icons.mic),),
+                child: const Icon(Icons.mic),
+              ),
             ],
           ),
         ),
