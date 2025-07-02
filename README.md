@@ -8,12 +8,14 @@ This project is a starting point for using the Azure Speech Recognition Services
 
 To use this plugin you must have already create an account on the cognitive service page.
 
+This version of the plugin uses Dart null safety and therefore requires Flutter 2.10 or later.
+
 ## Installation
 
 To install the package use the latest:
 
 ```dart
-azure_speech_recognition: ^0.8.2
+azure_speech_recognition: ^0.10.0
 ```
 
 ## Usage
@@ -26,9 +28,15 @@ import 'package:azure_speech_recognition/azure_speech_recognition.dart';
 There are 2 type of initializer:
 ### Simple initializer
 It should be used in any case other than the IntentRecognition.
-The language default setting is "en-EN" but you could use what you want (if it is supported). 
+The language default setting is "en-EN" but you could use what you want (if it is supported).
 ```dart
 AzureSpeechRecognition.initialize("your_subscription_key", "your_server_region",lang: "it-IT");
+```
+
+If you are using the Speech SDK container, you can specify the service endpoint instead of the region:
+
+```dart
+AzureSpeechRecognition.initializeWithEndpoint("your_subscription_key", "https://mycontainer:5000", lang: "it-IT");
 ```
 
 ### Intent initializer
@@ -87,6 +95,14 @@ Future recognizeVoice() async {
 
 ### Voice recognition with microphone streaming
 It returns in the recognitionResultHandler the temporary phrases that it understand and at the end the final response is returned by the setFinalTranscription method.
+
+### Real time transcription with speaker diarization
+Returns partial transcription results while also providing a `speakerId` for each segment.
+
+```dart
+AzureSpeechRecognition.transcribeWithDiarization();
+```
+
 
 ```dart
 
